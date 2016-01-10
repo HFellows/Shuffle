@@ -54,6 +54,9 @@
 
   )
 
+
+;; The python code I'm porting from.
+(comment
  def twist(self):
      for i in range(0, 624):
          # Get the most significant bit and add it to the less significant
@@ -65,40 +68,4 @@
          if y % 2 != 0:
              self.mt[i] = self.mt[i] ^ 0x9908b0df
      self.index = 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     (def twister-state (agent :validator validator-fn
-                               :error-handler handler-fn
-                               :error-mode :continue))
-
-
-     ;validate-fn must be nil or a side-effect-free fn of one
-     ;argument, which will be passed the intended new state on any state
-     ;change. If the new state is unacceptable, the validate-fn should
-     ;return false or throw an exception.
-     (defn validator-fn
-       "Gatekeeper for new state; returns false if the new state is unacceptible."
-       [new-state] ;;that is, if it isn't (a-num [vector length 624])
-       (and (number? (first new-state))
-           (vector? (second new-state))
-           (= 624 (count (second new-state)))))
-
-     ;;andler-fn is called if an action throws an exception or
-     ;;f validate-fn rejects a new state
-     (defn handler-fn ""
-       [ex ag]
-       (print (str "An error occurred! Agent " ag " was hit!\nThe cause of the error was: " ex)))
+)
