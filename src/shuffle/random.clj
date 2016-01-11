@@ -26,14 +26,14 @@
 (defn random-numbers
   "A lazy sequence of pseudorandom numbers created from a Mersenne Twister."
   ([] (random-numbers 0 (take 624 inital-numbers)) ;;624 is Magic. Don't change it.
-  ([i v] (lazy-seq (cons (next i v) (random-numbers (inc i) v)))))
+  ([i v] (if (>= 624 i)
+      ;;if the index is >= 624, refresh the seed value vectors
+           (random-numbers 0 (twist val))
+           (lazy-seq (cons (next i v) (random-numbers (inc i) v)))))))
 
 (defn next
   "Returns a new pseudorandom number that's probably around int size. No promises."
   [i val]
-  (if (>= 624 i)
-      ;;if the index is >= 624, refresh the seed value vectors
-      (twist)
       (as-> (nth i (second val)) num
         ;;--BEGIN MAGIC--
         (bit-xor num (bit-shift-right num 11))
@@ -44,61 +44,24 @@
           ;Left shift by 15, bitwise'd by 4022730752
         (bit-xor num (bit-shift-right 18))
           ;Right shift by 15
-        (lower-32-bits num))))
+        (lower-32-bits num)))
         ;;wait, it's all magic. Damn.
         ;;--END MAGIC--
 
 (defn- twist
   "Refreshes the vector of seed values."
-  []
-
-  )
-
- def twist(self):
-     for i in range(0, 624):
-         # Get the most significant bit and add it to the less significant
-         # bits of the next number
-         y = _int32((self.mt[i] & 0x80000000) +
-                    (self.mt[(i + 1) % 624] & 0x7fffffff))
-         self.mt[i] = self.mt[(i + 397) % 624] ^ y >> 1
-
-         if y % 2 != 0:
-             self.mt[i] = self.mt[i] ^ 0x9908b0df
-     self.index = 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     (def twister-state (agent :validator validator-fn
-                               :error-handler handler-fn
-                               :error-mode :continue))
-
-
-     ;validate-fn must be nil or a side-effect-free fn of one
-     ;argument, which will be passed the intended new state on any state
-     ;change. If the new state is unacceptable, the validate-fn should
-     ;return false or throw an exception.
-     (defn validator-fn
-       "Gatekeeper for new state; returns false if the new state is unacceptible."
-       [new-state] ;;that is, if it isn't (a-num [vector length 624])
-       (and (number? (first new-state))
-           (vector? (second new-state))
-           (= 624 (count (second new-state)))))
-
-     ;;andler-fn is called if an action throws an exception or
-     ;;f validate-fn rejects a new state
-     (defn handler-fn ""
-       [ex ag]
-       (print (str "An error occurred! Agent " ag " was hit!\nThe cause of the error was: " ex)))
+  [val]
+  (loop [i 0 new []]
+    (if (>= i 623)
+      new
+      (let
+        [num (nth i val)
+        ;--BEGIN MAGIC--
+        y (lower-32-bits (+
+            (bit-and (nth i val) 0x80000000)]
+            (bit-and (% (nth (inc i) val) 624) 0x7fffffff)))
+        result (if (odd? y) ;;Originally 'if y % 2 != 0'
+          (bit-and (bit-shift-right (bit-xor (nth (% (+ i 397) 624) val) y) 1)
+            0x7fffffff)))
+          ((bit-shift-right (bit-xor (nth (% (+ i 397) 624) val) y) 1))]
+      (recur (inc i) (conj new result)))))
