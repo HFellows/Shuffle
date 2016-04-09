@@ -7,7 +7,7 @@
 ; See http://www0.cs.ucl.ac.uk/staff/d.jones/GoodPracticeRNG.pdf
 ;;Edit 6/1/16 IT'S GONNA BE PROMISES, LOL.
 
-(def seed 56434081)
+(def seed 1)
 ;TODO make it a function that reads from /dev/random on linux
 ;and figure out something else for other OS (OSes? OSs?)
 
@@ -21,7 +21,7 @@
   ([] (inital-numbers seed))
   ([n] (lazy-seq (cons n (inital-numbers
   ;;All constants are Magic, and should never be changed. Or discussed.
-         (lower-32-bits (inc (* 1812433253 (bit-xor n (bit-shift-right n 30))))))))))
+         (lower-32-bits (inc (*' 1812433253 (bit-xor n (bit-shift-right n 30))))))))))
 
 (defn- twist
 "Refreshes the vector of seed values."
@@ -35,16 +35,16 @@
          y (lower-32-bits (+
           (bit-and (nth val i) 0x80000000)
           (bit-and (nth val (mod (inc i) 624)) 0x7fffffff)))
-         r (bit-shift-right (bit-xor (nth val (mod (+ i 397) 624)) y) 1)
+         r (bit-xor (nth val (mod (+ i 397) 624)) (bit-shift-right y 1))
          result (if (odd? y) ;;Originally 'if y % 2 != 0
                   (bit-xor r 0x9908b0df)
                   r)]
       (recur (inc i) (conj new result))))))
 
-(defn- next
+(defn- next-num
   "Returns a new pseudorandom number that's probably around int size. No promises."
   [i val]
-    (as-> (nth i (second val)) num
+  (as-> (nth val i) num
     ;;--BEGIN MAGIC--
       (bit-xor num (bit-shift-right num 11))
       ;Right shift by 11
@@ -58,13 +58,10 @@
       ;wait, it's all magic. Damn.
     ;;--END MAGIC--
 
-
 (defn random-numbers
   "A lazy sequence of pseudorandom numbers created from a Mersenne Twister."
   ([] (random-numbers 0 (take 624 (inital-numbers)))) ;;624 is Magic. Don't change it.
-  ([i v] (if (>= 624 i)
+  ([i v] (if (>= i 624)
   ;;if the index is >= 624, refresh the seed value vectors
            (random-numbers 0 (twist v))
-          (lazy-seq (cons (next i v) (random-numbers (inc i) v))))))
-
-;;(take 15 (random-numbers))
+          (lazy-seq (cons (next-num i v) (random-numbers (inc i) v))))))
