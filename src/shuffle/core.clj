@@ -1,5 +1,6 @@
 (ns shuffle.core
-  (:require [shuffle.random :as rand]))
+  (:require [shuffle.random :as rand]
+            [shuffle.card :as card]))
 
 (defn foo
   "I don't do a whole lot."
@@ -8,5 +9,4 @@
 
 (defn -main
   "Run"
-  [& args]
-  (print (take 10 (rand/random-numbers))))
+  [& args])
