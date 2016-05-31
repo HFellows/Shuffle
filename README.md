@@ -14,6 +14,7 @@ It should
 
 To do:
 - Make own, absurdly complex, PRNG.
+- - as it turns out, clojure's [unchecked arithmetic is broken for boxed longs](http://dev.clojure.org/jira/browse/CLJ-1832)
 - Make a satsifactory datastructure for abstract cards.
 - Read, and extract order from, files containing decks of cards.
 - Implement sort: Bogobogosort? Bubble sort? Bitonic Mergesort?
